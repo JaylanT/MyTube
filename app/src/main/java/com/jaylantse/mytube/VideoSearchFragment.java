@@ -1,5 +1,6 @@
 package com.jaylantse.mytube;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ import java.util.List;
 public class VideoSearchFragment extends Fragment {
 
     private VideoListFragment videoListFrag;
+    private Activity mActivity;
 
     private static final long NUMBER_OF_VIDEOS_RETURNED = 25;
 
@@ -42,14 +44,9 @@ public class VideoSearchFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_search_videos, container, false);
 
-        if (view.findViewById(R.id.fragment_container) != null) {
-            if (savedInstanceState == null) {
-                videoListFrag = new VideoListFragment();
-
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .add(R.id.fragment_container, videoListFrag).commit();
-            }
-        }
+        videoListFrag = new VideoListFragment();
+        getActivity().getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container, videoListFrag).commit();
 
         EditText searchInput = (EditText) view.findViewById(R.id.video_search_input);
         searchInput.setOnEditorActionListener(new EditText.OnEditorActionListener() {
@@ -72,6 +69,13 @@ public class VideoSearchFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onAttach(Context c) {
+        super.onAttach(c);
+
+        mActivity = (Activity) c;
+    }
+
     public void updateVideoList(final List<SearchResult> searchResultList) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -90,7 +94,7 @@ public class VideoSearchFragment extends Fragment {
             String query = params[0];
             search(query);
 
-            return "Done";
+            return null;
         }
 
         private void search(String query) {
@@ -112,7 +116,7 @@ public class VideoSearchFragment extends Fragment {
 
                 // To increase efficiency, only retrieve the fields that the
                 // application uses.
-                search.setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url)");
+                search.setFields("items(id/kind,id/videoId,snippet/title)");
                 search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
 
                 // Call the API and print results.
@@ -121,9 +125,9 @@ public class VideoSearchFragment extends Fragment {
 
                 updateVideoList(searchResultList);
 
-                if (searchResultList != null) {
-                    prettyPrint(searchResultList.iterator(), query);
-                }
+//                if (searchResultList != null) {
+//                    prettyPrint(searchResultList.iterator(), query);
+//                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

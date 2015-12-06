@@ -1,5 +1,7 @@
 package com.jaylantse.mytube;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
 import com.google.android.youtube.player.YouTubeThumbnailView;
 import com.google.api.services.youtube.model.ResourceId;
@@ -16,20 +19,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//import android.support.v4.app.FragmentManager;
+//import android.support.v4.app.FragmentTransaction;
+
 /**
  * Created by Jaylan Tse on 11/29/2015.
  */
 public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.VideoViewHolder> {
 
     private List<SearchResult> videos;
+    private Activity mActivity;
     private final ThumbnailListener thumbnailListener;
     private final Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbnailViewToLoaderMap;
 
     /**
      * Constructor
      */
-    public VideoListAdapter(List<SearchResult> videos) {
+    public VideoListAdapter(List<SearchResult> videos, Activity mActivity) {
         this.videos = videos;
+        this.mActivity = mActivity;
         thumbnailListener = new ThumbnailListener();
         thumbnailViewToLoaderMap = new HashMap<>();
     }
@@ -38,7 +46,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     public VideoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.video_list_item, parent, false);
-        return new VideoViewHolder(view);
+        return new VideoViewHolder(view, mActivity);
     }
 
     @Override
@@ -52,7 +60,9 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
             String title = singleVideo.getSnippet().getTitle();
             holder.videoTitle.setText(title);
 
-            holder.videoThumb.setTag(rId.getVideoId());
+            String videoId = rId.getVideoId();
+            holder.videoId = videoId;
+            holder.videoThumb.setTag(videoId);
             holder.videoThumb.initialize(DeveloperKey.DEVELOPER_KEY, thumbnailListener);
         }
     }
@@ -73,17 +83,28 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
         public TextView videoTitle;
         public YouTubeThumbnailView videoThumb;
+        public String videoId;
+        public Activity mActivity;
 
-        public VideoViewHolder(View itemView) {
+        private static final int REQ_START_STANDALONE_PLAYER = 1;
+
+        public VideoViewHolder(View itemView, Activity mActivity) {
             super(itemView);
+
+            this.mActivity = mActivity;
 
             videoTitle = (TextView) itemView.findViewById(R.id.video_title);
             videoThumb = (YouTubeThumbnailView) itemView.findViewById(R.id.thumbnail);
+
+            itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-
+            Intent intent = YouTubeStandalonePlayer.createVideoIntent(mActivity
+                        , DeveloperKey.DEVELOPER_KEY, videoId, 0, true, false);
+            mActivity.startActivity(intent);
+            mActivity.startActivityForResult(intent, REQ_START_STANDALONE_PLAYER);
         }
     }
 

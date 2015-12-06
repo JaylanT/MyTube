@@ -28,8 +28,10 @@ public class VideoListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_videos_list, container, false);
 
         videoRecyclerView = (RecyclerView) view.findViewById(R.id.video_list_recycler_view);
-        videoRecyclerView.setAdapter(new VideoListAdapter(new ArrayList<SearchResult>()));
+        videoRecyclerView.setAdapter(new VideoListAdapter(new ArrayList<SearchResult>(), getActivity()));
         videoRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        videoAdapter = new VideoListAdapter(new ArrayList<SearchResult>(), getActivity());
 
         return view;
     }
@@ -42,7 +44,7 @@ public class VideoListFragment extends Fragment {
     }
 
     public void setVideoListAdapter(List<SearchResult> videos) {
-        videoAdapter = new VideoListAdapter(videos);
+        videoAdapter = new VideoListAdapter(videos, getActivity());
         videoRecyclerView.setAdapter(videoAdapter);
     }
 }
