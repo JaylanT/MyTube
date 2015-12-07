@@ -2,6 +2,8 @@ package com.jaylantse.mytube;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,17 +17,15 @@ import com.google.android.youtube.player.YouTubeThumbnailView;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//import android.support.v4.app.FragmentManager;
-//import android.support.v4.app.FragmentTransaction;
-
 /**
  * Created by Jaylan Tse on 11/29/2015.
  */
-public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.VideoViewHolder> {
+public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.VideoViewHolder> implements Parcelable {
 
     private List<SearchResult> videos;
     private Activity mActivity;
@@ -38,15 +38,36 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     public VideoListAdapter(List<SearchResult> videos, Activity mActivity) {
         this.videos = videos;
         this.mActivity = mActivity;
+
         thumbnailListener = new ThumbnailListener();
         thumbnailViewToLoaderMap = new HashMap<>();
     }
+
+    public VideoListAdapter(Parcel in) {
+        videos = new ArrayList<>();
+        in.readList(videos, SearchResult.class.getClassLoader());
+
+        thumbnailListener = new ThumbnailListener();
+        thumbnailViewToLoaderMap = new HashMap<>();
+    }
+
+    public static final Creator<VideoListAdapter> CREATOR = new Creator<VideoListAdapter>() {
+        @Override
+        public VideoListAdapter createFromParcel(Parcel in) {
+            return new VideoListAdapter(in);
+        }
+
+        @Override
+        public VideoListAdapter[] newArray(int size) {
+            return new VideoListAdapter[size];
+        }
+    };
 
     @Override
     public VideoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.video_list_item, parent, false);
-        return new VideoViewHolder(view, mActivity);
+        return new VideoViewHolder(view);
     }
 
     @Override
@@ -72,39 +93,52 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         return videos.size();
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeList(videos);
+    }
+
     public void releaseLoaders() {
         for (YouTubeThumbnailLoader loader : thumbnailViewToLoaderMap.values()) {
             loader.release();
         }
     }
 
-
-    public static class VideoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class VideoViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener, View.OnLongClickListener {
 
         public TextView videoTitle;
         public YouTubeThumbnailView videoThumb;
         public String videoId;
-        public Activity mActivity;
 
         private static final int REQ_START_STANDALONE_PLAYER = 1;
 
-        public VideoViewHolder(View itemView, Activity mActivity) {
+        public VideoViewHolder(View itemView) {
             super(itemView);
-
-            this.mActivity = mActivity;
 
             videoTitle = (TextView) itemView.findViewById(R.id.video_title);
             videoThumb = (YouTubeThumbnailView) itemView.findViewById(R.id.thumbnail);
 
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            Intent intent = YouTubeStandalonePlayer.createVideoIntent(mActivity
-                        , DeveloperKey.DEVELOPER_KEY, videoId, 0, true, false);
-            mActivity.startActivity(intent);
+            Intent intent = YouTubeStandalonePlayer.createVideoIntent(mActivity,
+                    DeveloperKey.DEVELOPER_KEY, videoId, 0, true, false);
             mActivity.startActivityForResult(intent, REQ_START_STANDALONE_PLAYER);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            System.out.println(videoId);
+            return false;
         }
     }
 

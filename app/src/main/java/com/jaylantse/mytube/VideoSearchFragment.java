@@ -1,6 +1,5 @@
 package com.jaylantse.mytube;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,13 +18,10 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
-import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
-import com.google.api.services.youtube.model.Thumbnail;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -34,9 +30,8 @@ import java.util.List;
 public class VideoSearchFragment extends Fragment {
 
     private VideoListFragment videoListFrag;
-    private Activity mActivity;
 
-    private static final long NUMBER_OF_VIDEOS_RETURNED = 25;
+    private static final long NUMBER_OF_VIDEOS_RETURNED = 50;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,9 +39,7 @@ public class VideoSearchFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_search_videos, container, false);
 
-        videoListFrag = new VideoListFragment();
-        getActivity().getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, videoListFrag).commit();
+        videoListFrag = (VideoListFragment) getChildFragmentManager().findFragmentById(R.id.fragment);
 
         EditText searchInput = (EditText) view.findViewById(R.id.video_search_input);
         searchInput.setOnEditorActionListener(new EditText.OnEditorActionListener() {
@@ -67,13 +60,6 @@ public class VideoSearchFragment extends Fragment {
         });
 
         return view;
-    }
-
-    @Override
-    public void onAttach(Context c) {
-        super.onAttach(c);
-
-        mActivity = (Activity) c;
     }
 
     public void updateVideoList(final List<SearchResult> searchResultList) {
@@ -102,7 +88,7 @@ public class VideoSearchFragment extends Fragment {
                 youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
                     public void initialize(HttpRequest request) throws IOException {
                     }
-                }).setApplicationName("youtube-cmdline-search-sample").build();
+                }).setApplicationName("youtube-search").build();
 
                 YouTube.Search.List search = youtube.search().list("id,snippet");
 
@@ -116,7 +102,7 @@ public class VideoSearchFragment extends Fragment {
 
                 // To increase efficiency, only retrieve the fields that the
                 // application uses.
-                search.setFields("items(id/kind,id/videoId,snippet/title)");
+                search.setFields("items(id/kind,id/videoId,snippet/title,snippet/publishedAt)");
                 search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
 
                 // Call the API and print results.
@@ -124,51 +110,10 @@ public class VideoSearchFragment extends Fragment {
                 List<SearchResult> searchResultList = searchResponse.getItems();
 
                 updateVideoList(searchResultList);
-
-//                if (searchResultList != null) {
-//                    prettyPrint(searchResultList.iterator(), query);
-//                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-        }
-
-        /*
-         * Prints out all results in the Iterator. For each result, print the
-         * title, video ID, and thumbnail.
-         *
-         * @param iteratorSearchResults Iterator of SearchResults to print
-         *
-         * @param query Search query (String)
-         */
-        private void prettyPrint(Iterator<SearchResult> iteratorSearchResults, String query) {
-
-            System.out.println("\n=============================================================");
-            System.out.println(
-                    "   First " + NUMBER_OF_VIDEOS_RETURNED + " videos for search on \"" + query + "\".");
-            System.out.println("=============================================================\n");
-
-            if (!iteratorSearchResults.hasNext()) {
-                System.out.println(" There aren't any results for your query.");
-            }
-
-            while (iteratorSearchResults.hasNext()) {
-
-                SearchResult singleVideo = iteratorSearchResults.next();
-                ResourceId rId = singleVideo.getId();
-
-                // Confirm that the result represents a video. Otherwise, the
-                // item will not contain a video ID.
-                if (rId.getKind().equals("youtube#video")) {
-                    Thumbnail thumbnail = singleVideo.getSnippet().getThumbnails().getDefault();
-
-                    System.out.println(" Video Id: " + rId.getVideoId());
-                    System.out.println(" Title: " + singleVideo.getSnippet().getTitle());
-                    System.out.println(" Thumbnail: " + thumbnail.getUrl());
-                    System.out.println("\n-------------------------------------------------------------\n");
-                }
-            }
         }
     }
 }

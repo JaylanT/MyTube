@@ -28,12 +28,22 @@ public class VideoListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_videos_list, container, false);
 
         videoRecyclerView = (RecyclerView) view.findViewById(R.id.video_list_recycler_view);
-        videoRecyclerView.setAdapter(new VideoListAdapter(new ArrayList<SearchResult>(), getActivity()));
+
+        if (savedInstanceState != null) {
+            videoAdapter = savedInstanceState.getParcelable("adapter");
+        } else {
+            videoAdapter = new VideoListAdapter(new ArrayList<SearchResult>(), getActivity());
+        }
+        videoRecyclerView.setAdapter(videoAdapter);
         videoRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        videoAdapter = new VideoListAdapter(new ArrayList<SearchResult>(), getActivity());
-
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("adapter", videoAdapter);
     }
 
     @Override
@@ -43,8 +53,8 @@ public class VideoListFragment extends Fragment {
         videoAdapter.releaseLoaders();
     }
 
-    public void setVideoListAdapter(List<SearchResult> videos) {
-        videoAdapter = new VideoListAdapter(videos, getActivity());
+    public void setVideoListAdapter(List<SearchResult> videosList) {
+        videoAdapter = new VideoListAdapter(videosList, getActivity());
         videoRecyclerView.setAdapter(videoAdapter);
     }
 }

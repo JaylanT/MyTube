@@ -14,9 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.android.youtube.player.YouTubePlayer;
-
-public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnFullscreenListener {
+public class MainActivity extends AppCompatActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -32,8 +30,6 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-
-    private boolean isFullscreen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +68,6 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onFullscreen(boolean isFullscreen) {
-        this.isFullscreen = isFullscreen;
     }
 
 
@@ -150,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+
             return rootView;
         }
     }
