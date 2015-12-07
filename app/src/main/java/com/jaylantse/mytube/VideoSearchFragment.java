@@ -13,15 +13,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.services.youtube.YouTube;
-import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -31,7 +24,6 @@ public class VideoSearchFragment extends Fragment {
 
     private VideoListFragment videoListFrag;
 
-    private static final long NUMBER_OF_VIDEOS_RETURNED = 50;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,7 +43,7 @@ public class VideoSearchFragment extends Fragment {
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
                     String query = v.getText().toString();
-                    new YouTubeSearch().execute(query);
+                    new AsyncYouTubeSearch().execute(query);
 
                     return true;
                 }
@@ -71,49 +63,26 @@ public class VideoSearchFragment extends Fragment {
         });
     }
 
-    private class YouTubeSearch extends AsyncTask<String, Void, String> {
-
-        private YouTube youtube;
+    private class AsyncYouTubeSearch extends AsyncTask<String, Void, List<SearchResult>> {
 
         @Override
-        protected String doInBackground(String[] params) {
+        protected List<SearchResult> doInBackground(String[] params) {
             String query = params[0];
-            search(query);
+
+            try {
+                return YouTubeSearch.search(query);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             return null;
         }
 
-        private void search(String query) {
-            try {
-                youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
-                    public void initialize(HttpRequest request) throws IOException {
-                    }
-                }).setApplicationName("youtube-search").build();
-
-                YouTube.Search.List search = youtube.search().list("id,snippet");
-
-                String apiKey = DeveloperKey.DEVELOPER_KEY;
-                search.setKey(apiKey);
-                search.setQ(query);
-
-                // Restrict the search results to only include videos. See:
-                // https://developers.google.com/youtube/v3/docs/search/list#type
-                search.setType("video");
-
-                // To increase efficiency, only retrieve the fields that the
-                // application uses.
-                search.setFields("items(id/kind,id/videoId,snippet/title,snippet/publishedAt)");
-                search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
-
-                // Call the API and print results.
-                SearchListResponse searchResponse = search.execute();
-                List<SearchResult> searchResultList = searchResponse.getItems();
-
-                updateVideoList(searchResultList);
-            } catch (IOException e) {
-                e.printStackTrace();
+        @Override
+        protected void onPostExecute(List<SearchResult> videoList) {
+            if (videoList != null) {
+                updateVideoList(videoList);
             }
-
         }
     }
 }

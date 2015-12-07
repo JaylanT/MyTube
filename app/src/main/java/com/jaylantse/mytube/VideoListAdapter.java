@@ -14,6 +14,7 @@ import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
 import com.google.android.youtube.player.YouTubeThumbnailView;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
 
@@ -80,6 +81,8 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         if (rId.getKind().equals("youtube#video")) {
             String title = singleVideo.getSnippet().getTitle();
             holder.videoTitle.setText(title);
+            String publishedAt = singleVideo.getSnippet().getPublishedAt().toStringRfc3339();
+            holder.videoPublishedAt.setText(publishedAt.substring(0, publishedAt.indexOf("T")));
 
             String videoId = rId.getVideoId();
             holder.videoId = videoId;
@@ -113,6 +116,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
             implements View.OnClickListener, View.OnLongClickListener {
 
         public TextView videoTitle;
+        public TextView videoPublishedAt;
         public YouTubeThumbnailView videoThumb;
         public String videoId;
 
@@ -122,6 +126,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
             super(itemView);
 
             videoTitle = (TextView) itemView.findViewById(R.id.video_title);
+            videoPublishedAt = (TextView) itemView.findViewById(R.id.published_at);
             videoThumb = (YouTubeThumbnailView) itemView.findViewById(R.id.thumbnail);
 
             itemView.setOnClickListener(this);
