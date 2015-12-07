@@ -53,7 +53,7 @@ public class VideoSearchFragment extends Fragment {
         return view;
     }
 
-    public void updateVideoList(final List<SearchResult> searchResultList) {
+    private void updateVideoList(final List<SearchResult> searchResultList) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {

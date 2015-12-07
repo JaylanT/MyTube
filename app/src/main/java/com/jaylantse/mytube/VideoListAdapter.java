@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.VideoViewHolder> implements Parcelable {
 
-    private List<SearchResult> videos;
+    private final List<SearchResult> videos;
     private final ThumbnailListener thumbnailListener;
     private final Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbnailViewToLoaderMap;
 
@@ -112,11 +112,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     public class VideoViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener, View.OnLongClickListener {
 
-        public TextView videoTitle;
-        public TextView videoPublishedAt;
-        public YouTubeThumbnailView videoThumb;
+        public final TextView videoTitle;
+        public final TextView videoPublishedAt;
+        public final YouTubeThumbnailView videoThumb;
+        public final Activity mActivity;
         public String videoId;
-        public Activity mActivity;
 
         private static final int REQ_START_STANDALONE_PLAYER = 1;
 

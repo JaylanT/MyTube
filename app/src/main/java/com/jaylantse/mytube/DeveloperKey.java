@@ -5,7 +5,7 @@ package com.jaylantse.mytube;
 /**
  * Static container class for holding a reference to your YouTube Developer Key.
  */
-public class DeveloperKey {
+class DeveloperKey {
 
   /**
    * Please replace this with a valid API key which is enabled for the
