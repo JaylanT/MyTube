@@ -24,7 +24,6 @@ public class VideoSearchFragment extends Fragment {
 
     private VideoListFragment videoListFrag;
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

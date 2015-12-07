@@ -14,7 +14,6 @@ import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
 import com.google.android.youtube.player.YouTubeThumbnailView;
-import com.google.api.client.util.DateTime;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
 
@@ -29,16 +28,14 @@ import java.util.Map;
 public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.VideoViewHolder> implements Parcelable {
 
     private List<SearchResult> videos;
-    private Activity mActivity;
     private final ThumbnailListener thumbnailListener;
     private final Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbnailViewToLoaderMap;
 
     /**
      * Constructor
      */
-    public VideoListAdapter(List<SearchResult> videos, Activity mActivity) {
+    public VideoListAdapter(List<SearchResult> videos) {
         this.videos = videos;
-        this.mActivity = mActivity;
 
         thumbnailListener = new ThumbnailListener();
         thumbnailViewToLoaderMap = new HashMap<>();
@@ -119,6 +116,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         public TextView videoPublishedAt;
         public YouTubeThumbnailView videoThumb;
         public String videoId;
+        public Activity mActivity;
 
         private static final int REQ_START_STANDALONE_PLAYER = 1;
 
@@ -128,6 +126,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
             videoTitle = (TextView) itemView.findViewById(R.id.video_title);
             videoPublishedAt = (TextView) itemView.findViewById(R.id.published_at);
             videoThumb = (YouTubeThumbnailView) itemView.findViewById(R.id.thumbnail);
+            mActivity = (Activity) itemView.getContext();
 
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
@@ -143,7 +142,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         @Override
         public boolean onLongClick(View v) {
             System.out.println(videoId);
-            return false;
+            return true;
         }
     }
 

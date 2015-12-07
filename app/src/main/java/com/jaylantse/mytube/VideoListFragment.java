@@ -32,7 +32,7 @@ public class VideoListFragment extends Fragment {
         if (savedInstanceState != null) {
             videoAdapter = savedInstanceState.getParcelable("adapter");
         } else {
-            videoAdapter = new VideoListAdapter(new ArrayList<SearchResult>(), getActivity());
+            videoAdapter = new VideoListAdapter(new ArrayList<SearchResult>());
         }
         videoRecyclerView.setAdapter(videoAdapter);
         videoRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -54,7 +54,7 @@ public class VideoListFragment extends Fragment {
     }
 
     public void setVideoListAdapter(List<SearchResult> videosList) {
-        videoAdapter = new VideoListAdapter(videosList, getActivity());
+        videoAdapter = new VideoListAdapter(videosList);
         videoRecyclerView.setAdapter(videoAdapter);
     }
 }

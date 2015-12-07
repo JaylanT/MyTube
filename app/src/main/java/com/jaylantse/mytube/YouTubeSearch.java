@@ -22,7 +22,7 @@ public class YouTubeSearch {
         YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
             public void initialize(HttpRequest request) throws IOException {
             }
-        }).setApplicationName("youtube-search").build();
+        }).setApplicationName("mytube").build();
 
         YouTube.Search.List search = youtube.search().list("id,snippet");
 
