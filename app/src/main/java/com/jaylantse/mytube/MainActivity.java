@@ -1,6 +1,7 @@
 package com.jaylantse.mytube;
 
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -37,6 +38,27 @@ public class MainActivity extends AppCompatActivity {
      */
         ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 1) {
+                    mSectionsPagerAdapter.update();
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(mViewPager);
     }
 
 
@@ -55,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_search) {
             return true;
         }
 
@@ -71,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
+        }
+
+        public void update() {
+            notifyDataSetChanged();
         }
 
         @Override
@@ -89,5 +115,29 @@ public class MainActivity extends AppCompatActivity {
             // Show 2 total pages.
             return 2;
         }
+
+        @Override
+        public int getItemPosition(Object object) {
+            if (object instanceof UpdateableFragment) {
+                ((FavoriteVideosFragment) object).update();
+            }
+
+            return super.getItemPosition(object);
+        }
+
+        @Override
+        public String getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "Search";
+                case 1:
+                    return "Favorites";
+            }
+            return null;
+        }
+    }
+
+    interface UpdateableFragment {
+        void update();
     }
 }

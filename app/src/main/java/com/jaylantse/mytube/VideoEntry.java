@@ -10,6 +10,7 @@ class VideoEntry implements Serializable {
     private final String title;
     private final String videoId;
     private final String publishedAt;
+    private int viewCount;
 
     public VideoEntry(String videoId, String title, String publishedAt) {
         this.videoId = videoId;
@@ -27,5 +28,13 @@ class VideoEntry implements Serializable {
 
     public String getPublishedAt() {
         return publishedAt;
+    }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
+    }
+
+    public int getViewCount() {
+        return viewCount;
     }
 }

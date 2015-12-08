@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 /**
  * Created by Jaylan Tse on 12/7/2015.
  */
-public class FavoriteVideosFragment extends Fragment {
+public class FavoriteVideosFragment extends Fragment implements MainActivity.UpdateableFragment {
 
     private VideoListFragment videoListFrag;
     private FavoriteVideos favoriteVideos;
@@ -27,7 +27,7 @@ public class FavoriteVideosFragment extends Fragment {
         return view;
     }
 
-    public void updateView() {
+    public void update() {
         videoListFrag.setVideoListAdapter(favoriteVideos.getFavorites());
     }
 }

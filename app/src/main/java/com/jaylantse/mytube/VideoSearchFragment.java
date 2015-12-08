@@ -13,8 +13,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.api.services.youtube.model.SearchResult;
-
 import java.util.List;
 
 /**

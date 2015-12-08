@@ -37,12 +37,17 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/published_at"
-            android:layout_gravity="bottom"
-            android:layout_alignParentStart="false"
-            android:layout_alignEnd="@+id/video_title"
-            android:layout_alignStart="@id/video_title"
+            android:id="@+id/view_count"
             android:layout_below="@+id/video_title"
+            android:layout_alignStart="@id/video_title"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/published_at"
+            android:layout_alignStart="@id/video_title"
+            android:layout_below="@+id/view_count"
             android:textSize="12sp" />
 
         <ImageView

@@ -23,19 +23,7 @@ class FavoriteVideos {
     public FavoriteVideos(Context mContext) {
         this.mContext = mContext;
 
-        File file = new File(mContext.getDir("data", Context.MODE_PRIVATE), "favorites");
-
-        try {
-            ObjectInputStream ois =
-                    new ObjectInputStream(new FileInputStream(file));
-            favoritesMap = (HashMap) ois.readObject();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (favoritesMap == null) {
-                favoritesMap = new HashMap<>();
-            }
-        }
+        getFavoritesFromStorage();
     }
 
     public void addToFavorites(String videoId, VideoEntry videoEntry) {
@@ -63,12 +51,30 @@ class FavoriteVideos {
     }
 
     public List<VideoEntry> getFavorites() {
+        getFavoritesFromStorage();
+
         List<VideoEntry> favoriteVideos = new ArrayList<>();
         for(Map.Entry<String, VideoEntry> entry : favoritesMap.entrySet()) {
             favoriteVideos.add(entry.getValue());
         }
 
         return favoriteVideos;
+    }
+
+    private void getFavoritesFromStorage() {
+        File file = new File(mContext.getDir("data", Context.MODE_PRIVATE), "favorites");
+
+        try {
+            ObjectInputStream ois =
+                    new ObjectInputStream(new FileInputStream(file));
+            favoritesMap = (HashMap) ois.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (favoritesMap == null) {
+                favoritesMap = new HashMap<>();
+            }
+        }
     }
 
     private void saveFavoriteVideos() throws Exception {

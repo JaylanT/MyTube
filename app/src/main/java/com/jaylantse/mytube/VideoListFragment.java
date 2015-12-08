@@ -8,8 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.api.services.youtube.model.SearchResult;
-
 import java.util.ArrayList;
 import java.util.List;
 

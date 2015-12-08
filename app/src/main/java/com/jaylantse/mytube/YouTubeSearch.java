@@ -8,8 +8,17 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +54,7 @@ class YouTubeSearch {
         List<SearchResult> searchResults = searchResponse.getItems();
 
         List<VideoEntry> videoEntries = new ArrayList<>();
+        String videoIds = "";
 
         for (SearchResult result : searchResults) {
             ResourceId rId = result.getId();
@@ -57,9 +67,50 @@ class YouTubeSearch {
                 String videoId = rId.getVideoId();
 
                 videoEntries.add(new VideoEntry(videoId, title, publishedAt));
+                videoIds += videoId + ",";
             }
         }
 
+        List<Integer> viewCounts = getViewCount(videoIds.substring(0, videoIds.length() - 1));
+        for (int i = 0; i < videoEntries.size(); i++) {
+            videoEntries.get(i).setViewCount(viewCounts.get(i));
+        }
+
         return videoEntries;
+    }
+
+    private static List<Integer> getViewCount(String videoId) throws Exception {
+        InputStream is = null;
+
+        URL url = new URL("https://www.googleapis.com/youtube/v3/videos?id="
+                + videoId + "&key=" +DeveloperKey.DEVELOPER_KEY
+                +"&part=statistics&fields=items(statistics(viewCount))");
+
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(10000 /* milliseconds */);
+        conn.setConnectTimeout(15000 /* milliseconds */);
+        conn.setRequestMethod("GET");
+        conn.setDoInput(true);
+        // Starts the query
+        conn.connect();
+        is = conn.getInputStream();
+
+        return parseJson(is);
+    }
+
+    private static List<Integer> parseJson(InputStream stream) throws IOException {
+        Gson gson = new GsonBuilder().create();
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        JsonObject json = gson.fromJson(reader, JsonObject.class);
+
+        JsonArray arrayOfStats = json.get("items").getAsJsonArray();
+
+        List<Integer> viewCounts = new ArrayList<>();
+
+        for (int i = 0; i < arrayOfStats.size(); i++) {
+            viewCounts.add(arrayOfStats.get(i).getAsJsonObject().get("statistics").getAsJsonObject().get("viewCount").getAsInt());
+        }
+
+        return viewCounts;
     }
 }
