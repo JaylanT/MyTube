@@ -53,7 +53,7 @@ public class VideoSearchFragment extends Fragment {
         return view;
     }
 
-    private void updateVideoList(final List<SearchResult> searchResultList) {
+    private void updateVideoList(final List<VideoEntry> searchResultList) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -62,10 +62,10 @@ public class VideoSearchFragment extends Fragment {
         });
     }
 
-    private class AsyncYouTubeSearch extends AsyncTask<String, Void, List<SearchResult>> {
+    private class AsyncYouTubeSearch extends AsyncTask<String, Void, List<VideoEntry>> {
 
         @Override
-        protected List<SearchResult> doInBackground(String[] params) {
+        protected List<VideoEntry> doInBackground(String[] params) {
             String query = params[0];
 
             try {
@@ -78,7 +78,7 @@ public class VideoSearchFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(List<SearchResult> videoList) {
+        protected void onPostExecute(List<VideoEntry> videoList) {
             if (videoList != null) {
                 updateVideoList(videoList);
             }

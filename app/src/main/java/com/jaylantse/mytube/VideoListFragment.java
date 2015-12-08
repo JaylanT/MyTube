@@ -19,7 +19,7 @@ import java.util.List;
 public class VideoListFragment extends Fragment {
 
     private RecyclerView videoRecyclerView;
-    private VideoListAdapter videoAdapter;
+    private VideoListAdapter videoListAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -30,11 +30,11 @@ public class VideoListFragment extends Fragment {
         videoRecyclerView = (RecyclerView) view.findViewById(R.id.video_list_recycler_view);
 
         if (savedInstanceState != null) {
-            videoAdapter = savedInstanceState.getParcelable("adapter");
+            videoListAdapter = savedInstanceState.getParcelable("adapter");
         } else {
-            videoAdapter = new VideoListAdapter(new ArrayList<SearchResult>());
+            videoListAdapter = new VideoListAdapter(new ArrayList<VideoEntry>(), getContext());
         }
-        videoRecyclerView.setAdapter(videoAdapter);
+        videoRecyclerView.setAdapter(videoListAdapter);
         videoRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         return view;
@@ -43,18 +43,18 @@ public class VideoListFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("adapter", videoAdapter);
+        outState.putParcelable("adapter", videoListAdapter);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
-        videoAdapter.releaseLoaders();
+        videoListAdapter.releaseLoaders();
     }
 
-    public void setVideoListAdapter(List<SearchResult> videosList) {
-        videoAdapter = new VideoListAdapter(videosList);
-        videoRecyclerView.setAdapter(videoAdapter);
+    public void setVideoListAdapter(List<VideoEntry> videosList) {
+        videoListAdapter = new VideoListAdapter(videosList, getContext());
+        videoRecyclerView.setAdapter(videoListAdapter);
     }
 }

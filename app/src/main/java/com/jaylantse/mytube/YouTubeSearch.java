@@ -5,20 +5,22 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Jaylan Tse on 12/6/2015.
  */
-public class YouTubeSearch {
+class YouTubeSearch {
 
     private static final long NUMBER_OF_VIDEOS_RETURNED = 50;
 
-    public static List<SearchResult> search(String query) throws Exception {
+    public static List<VideoEntry> search(String query) throws Exception {
         YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
             public void initialize(HttpRequest request) throws IOException {
             }
@@ -40,7 +42,24 @@ public class YouTubeSearch {
         search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
 
         SearchListResponse searchResponse = search.execute();
+        List<SearchResult> searchResults = searchResponse.getItems();
 
-        return searchResponse.getItems();
+        List<VideoEntry> videoEntries = new ArrayList<>();
+
+        for (SearchResult result : searchResults) {
+            ResourceId rId = result.getId();
+
+            // Confirm that the result represents a video. Otherwise, the
+            // item will not contain a video ID.
+            if (rId.getKind().equals("youtube#video")) {
+                String title = result.getSnippet().getTitle();
+                String publishedAt = result.getSnippet().getPublishedAt().toStringRfc3339();
+                String videoId = rId.getVideoId();
+
+                videoEntries.add(new VideoEntry(videoId, title, publishedAt));
+            }
+        }
+
+        return videoEntries;
     }
 }

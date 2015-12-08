@@ -15,7 +15,7 @@
         android:scaleType="centerInside"
         android:layout_weight="45" />
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -23,21 +23,36 @@
 
         <TextView
             android:id="@+id/video_title"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:layout_alignParentStart="true"
+            android:textColor="#000000" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/published_at"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
             android:layout_gravity="bottom"
-            android:layout_marginTop="10dp" />
-    </LinearLayout>
+            android:layout_alignParentStart="false"
+            android:layout_alignEnd="@+id/video_title"
+            android:layout_alignStart="@id/video_title"
+            android:layout_below="@+id/video_title"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:id="@+id/favorite_video"
+            android:layout_gravity="end"
+            android:src="@drawable/ic_star_border_black_24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true" />
+    </RelativeLayout>
 
 </LinearLayout>

@@ -1,15 +1,31 @@
 package com.jaylantse.mytube;
 
+import java.io.Serializable;
+
 /**
  * Created by Jaylan Tse on 12/5/2015.
  */
-public class VideoEntry {
+class VideoEntry implements Serializable {
 
-    private final String text;
+    private final String title;
     private final String videoId;
+    private final String publishedAt;
 
-    public VideoEntry(String text, String videoId) {
-        this.text = text;
+    public VideoEntry(String videoId, String title, String publishedAt) {
         this.videoId = videoId;
+        this.title = title;
+        this.publishedAt = publishedAt;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getVideoId() {
+        return videoId;
+    }
+
+    public String getPublishedAt() {
+        return publishedAt;
     }
 }

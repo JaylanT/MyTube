@@ -1,6 +1,7 @@
 package com.jaylantse.mytube;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,13 +9,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
 import com.google.android.youtube.player.YouTubeThumbnailView;
-import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
 
 import java.util.ArrayList;
@@ -27,26 +28,36 @@ import java.util.Map;
  */
 public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.VideoViewHolder> implements Parcelable {
 
-    private final List<SearchResult> videos;
+    private final List<VideoEntry> videos;
     private final ThumbnailListener thumbnailListener;
     private final Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbnailViewToLoaderMap;
+    private final FavoriteVideos favoriteVideos;
+    private Context mContext;
 
     /**
      * Constructor
      */
-    public VideoListAdapter(List<SearchResult> videos) {
+    public VideoListAdapter(List<VideoEntry> videos, Context mContext) {
         this.videos = videos;
+        this.mContext = mContext;
 
         thumbnailListener = new ThumbnailListener();
         thumbnailViewToLoaderMap = new HashMap<>();
+        favoriteVideos = new FavoriteVideos(mContext);
     }
 
-    public VideoListAdapter(Parcel in) {
+    private VideoListAdapter(Parcel in) {
         videos = new ArrayList<>();
         in.readList(videos, SearchResult.class.getClassLoader());
 
         thumbnailListener = new ThumbnailListener();
         thumbnailViewToLoaderMap = new HashMap<>();
+        favoriteVideos = new FavoriteVideos(mContext);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeList(videos);
     }
 
     public static final Creator<VideoListAdapter> CREATOR = new Creator<VideoListAdapter>() {
@@ -69,23 +80,37 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     }
 
     @Override
-    public void onBindViewHolder(VideoViewHolder holder, int position) {
-        SearchResult singleVideo = videos.get(position);
-        ResourceId rId = singleVideo.getId();
+    public void onBindViewHolder(final VideoViewHolder holder, final int position) {
+        final VideoEntry singleVideo = videos.get(position);
 
-        // Confirm that the result represents a video. Otherwise, the
-        // item will not contain a video ID.
-        if (rId.getKind().equals("youtube#video")) {
-            String title = singleVideo.getSnippet().getTitle();
-            holder.videoTitle.setText(title);
-            String publishedAt = singleVideo.getSnippet().getPublishedAt().toStringRfc3339();
-            holder.videoPublishedAt.setText(publishedAt.substring(0, publishedAt.indexOf("T")));
+        String title = singleVideo.getTitle();
+        holder.videoTitle.setText(title);
+        String publishedAt = singleVideo.getPublishedAt();
+        holder.videoPublishedAt.setText(publishedAt.substring(0, publishedAt.indexOf("T")));
 
-            String videoId = rId.getVideoId();
-            holder.videoId = videoId;
-            holder.videoThumb.setTag(videoId);
-            holder.videoThumb.initialize(DeveloperKey.DEVELOPER_KEY, thumbnailListener);
+        final String videoId = singleVideo.getVideoId();
+        holder.videoId = videoId;
+        holder.videoThumb.setTag(videoId);
+        holder.videoThumb.initialize(DeveloperKey.DEVELOPER_KEY, thumbnailListener);
+
+        if (favoriteVideos.containsVideo(videoId)) {
+            holder.videoFavorite.setImageResource(R.drawable.ic_star_black_24dp);
+        } else {
+            holder.videoFavorite.setImageResource(R.drawable.ic_star_border_black_24dp);
         }
+
+        holder.videoFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!favoriteVideos.containsVideo(videoId)) {
+                    favoriteVideos.addToFavorites(videoId, singleVideo);
+                    holder.videoFavorite.setImageResource(R.drawable.ic_star_black_24dp);
+                } else {
+                    favoriteVideos.removeFromFavorites(videoId);
+                    holder.videoFavorite.setImageResource(R.drawable.ic_star_border_black_24dp);
+                }
+            }
+        });
     }
 
     @Override
@@ -98,24 +123,18 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeList(videos);
-    }
-
     public void releaseLoaders() {
         for (YouTubeThumbnailLoader loader : thumbnailViewToLoaderMap.values()) {
             loader.release();
         }
     }
 
-    public class VideoViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener, View.OnLongClickListener {
+    public class VideoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public final TextView videoTitle;
         public final TextView videoPublishedAt;
         public final YouTubeThumbnailView videoThumb;
-        public final Activity mActivity;
+        public final ImageView videoFavorite;
         public String videoId;
 
         private static final int REQ_START_STANDALONE_PLAYER = 1;
@@ -126,23 +145,17 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
             videoTitle = (TextView) itemView.findViewById(R.id.video_title);
             videoPublishedAt = (TextView) itemView.findViewById(R.id.published_at);
             videoThumb = (YouTubeThumbnailView) itemView.findViewById(R.id.thumbnail);
-            mActivity = (Activity) itemView.getContext();
+            videoFavorite = (ImageView) itemView.findViewById(R.id.favorite_video);
 
-            itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
+            videoThumb.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            Intent intent = YouTubeStandalonePlayer.createVideoIntent(mActivity,
+            Activity activity = (Activity) v.getContext();
+            Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity,
                     DeveloperKey.DEVELOPER_KEY, videoId, 0, true, false);
-            mActivity.startActivityForResult(intent, REQ_START_STANDALONE_PLAYER);
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            System.out.println(videoId);
-            return true;
+            activity.startActivityForResult(intent, REQ_START_STANDALONE_PLAYER);
         }
     }
 
