@@ -3,11 +3,9 @@ package com.jaylantse.mytube;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,13 +18,6 @@ import com.google.android.youtube.player.YouTubeThumbnailLoader;
 import com.google.android.youtube.player.YouTubeThumbnailView;
 import com.google.api.services.youtube.model.SearchResult;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,7 +44,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
         thumbnailListener = new ThumbnailListener();
         thumbnailViewToLoaderMap = new HashMap<>();
-        favoriteVideos = new FavoriteVideos(mContext);
+        favoriteVideos = FavoriteVideos.getInstance(mContext);
     }
 
     @Override
@@ -72,8 +63,8 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         String publishedAt = singleVideo.getPublishedAt();
         holder.videoPublishedAt.setText(publishedAt.substring(0, publishedAt.indexOf("T")));
         int viewCount = singleVideo.getViewCount();
-        String viewCountString = NumberFormat.getInstance().format(viewCount);
-        holder.videoViewCount.setText(mContext.getString(R.string.view_count, viewCountString));
+        String viewCountString = NumberFormat.getInstance().format(viewCount) + " views";
+        holder.videoViewCount.setText(viewCountString);
 
         final String videoId = singleVideo.getVideoId();
         holder.videoId = videoId;
@@ -118,7 +109,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
         thumbnailListener = new ThumbnailListener();
         thumbnailViewToLoaderMap = new HashMap<>();
-        favoriteVideos = new FavoriteVideos(mContext);
+        favoriteVideos = FavoriteVideos.getInstance(mContext);
     }
 
     @Override

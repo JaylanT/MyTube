@@ -20,14 +20,14 @@ public class FavoriteVideosFragment extends Fragment implements MainActivity.Upd
 
         View view = inflater.inflate(R.layout.fragment_favorite_videos, container, false);
 
-        favoriteVideos = new FavoriteVideos(getContext());
+        favoriteVideos = FavoriteVideos.getInstance(getContext());
         videoListFrag = (VideoListFragment) getChildFragmentManager().findFragmentById(R.id.favorites_fragment);
-        videoListFrag.setVideoListAdapter(favoriteVideos.getFavorites());
+        videoListFrag.setVideoListAdapter(favoriteVideos.getFavoritesList());
 
         return view;
     }
 
     public void update() {
-        videoListFrag.setVideoListAdapter(favoriteVideos.getFavorites());
+        videoListFrag.setVideoListAdapter(favoriteVideos.getFavoritesList());
     }
 }

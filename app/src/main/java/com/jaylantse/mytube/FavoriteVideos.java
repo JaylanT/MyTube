@@ -20,10 +20,19 @@ class FavoriteVideos {
     private final Context mContext;
     private HashMap<String, VideoEntry> favoritesMap;
 
-    public FavoriteVideos(Context mContext) {
+    private static FavoriteVideos instance = null;
+
+    private FavoriteVideos(Context mContext) {
         this.mContext = mContext;
 
-        getFavoritesFromStorage();
+        loadFavoriteVideos();
+    }
+
+    public static FavoriteVideos getInstance(final Context mContext) {
+        if (instance == null) {
+            instance = new FavoriteVideos(mContext);
+        }
+        return instance;
     }
 
     public void addToFavorites(String videoId, VideoEntry videoEntry) {
@@ -50,9 +59,7 @@ class FavoriteVideos {
         return favoritesMap.containsKey(videoId);
     }
 
-    public List<VideoEntry> getFavorites() {
-        getFavoritesFromStorage();
-
+    public List<VideoEntry> getFavoritesList() {
         List<VideoEntry> favoriteVideos = new ArrayList<>();
         for(Map.Entry<String, VideoEntry> entry : favoritesMap.entrySet()) {
             favoriteVideos.add(entry.getValue());
@@ -61,7 +68,7 @@ class FavoriteVideos {
         return favoriteVideos;
     }
 
-    private void getFavoritesFromStorage() {
+    private void loadFavoriteVideos() {
         File file = new File(mContext.getDir("data", Context.MODE_PRIVATE), "favorites");
 
         try {

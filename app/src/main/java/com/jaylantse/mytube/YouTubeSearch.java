@@ -29,7 +29,7 @@ class YouTubeSearch {
 
     private static final long NUMBER_OF_VIDEOS_RETURNED = 50;
 
-    public static List<VideoEntry> search(String query) throws Exception {
+    public static List<VideoEntry> search(String query) throws IOException {
         YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
             public void initialize(HttpRequest request) throws IOException {
             }
@@ -71,7 +71,7 @@ class YouTubeSearch {
             }
         }
 
-        List<Integer> viewCounts = getViewCount(videoIds.substring(0, videoIds.length() - 1));
+        List<Integer> viewCounts = getViewCounts(videoIds.substring(0, videoIds.length() - 1));
         for (int i = 0; i < videoEntries.size(); i++) {
             videoEntries.get(i).setViewCount(viewCounts.get(i));
         }
@@ -79,7 +79,7 @@ class YouTubeSearch {
         return videoEntries;
     }
 
-    private static List<Integer> getViewCount(String videoId) throws Exception {
+    private static List<Integer> getViewCounts(String videoId) throws IOException {
         InputStream is = null;
 
         URL url = new URL("https://www.googleapis.com/youtube/v3/videos?id="
@@ -104,11 +104,12 @@ class YouTubeSearch {
         JsonObject json = gson.fromJson(reader, JsonObject.class);
 
         JsonArray arrayOfStats = json.get("items").getAsJsonArray();
-
         List<Integer> viewCounts = new ArrayList<>();
 
         for (int i = 0; i < arrayOfStats.size(); i++) {
-            viewCounts.add(arrayOfStats.get(i).getAsJsonObject().get("statistics").getAsJsonObject().get("viewCount").getAsInt());
+            viewCounts.add(arrayOfStats.get(i).getAsJsonObject()
+                    .get("statistics").getAsJsonObject()
+                    .get("viewCount").getAsInt());
         }
 
         return viewCounts;
