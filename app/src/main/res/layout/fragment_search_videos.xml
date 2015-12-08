@@ -5,18 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <EditText
-        android:imeOptions="actionSearch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/video_search_input"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
-        android:hint="@string/search"
-        android:inputType="text" />
-
     <fragment
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

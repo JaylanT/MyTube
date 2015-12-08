@@ -80,8 +80,6 @@ class YouTubeSearch {
     }
 
     private static List<Integer> getViewCounts(String videoId) throws IOException {
-        InputStream is = null;
-
         URL url = new URL("https://www.googleapis.com/youtube/v3/videos?id="
                 + videoId + "&key=" +DeveloperKey.DEVELOPER_KEY
                 +"&part=statistics&fields=items(statistics(viewCount))");
@@ -93,12 +91,12 @@ class YouTubeSearch {
         conn.setDoInput(true);
         // Starts the query
         conn.connect();
-        is = conn.getInputStream();
+        InputStream is = conn.getInputStream();
 
         return parseJson(is);
     }
 
-    private static List<Integer> parseJson(InputStream stream) throws IOException {
+    private static List<Integer> parseJson(InputStream stream) {
         Gson gson = new GsonBuilder().create();
         final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         JsonObject json = gson.fromJson(reader, JsonObject.class);
