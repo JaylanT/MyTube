@@ -18,7 +18,6 @@ public class VideoListFragment extends Fragment {
 
     private RecyclerView videoRecyclerView;
     private VideoListAdapter videoListAdapter;
-    private LinearLayoutManager mLayoutManager;
     private int previousTotal = 0;
     private boolean loading = true;
     private int visibleThreshold = 5;
@@ -40,14 +39,14 @@ public class VideoListFragment extends Fragment {
             videoListAdapter = new VideoListAdapter(new ArrayList<VideoEntry>(), getContext());
         }
         videoRecyclerView.setAdapter(videoListAdapter);
-        mLayoutManager = new LinearLayoutManager(getContext());
+        final LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         videoRecyclerView.setLayoutManager(mLayoutManager);
 
         videoRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if(dy > 0) {
+                if (dy > 0) {
                     visibleItemCount = videoRecyclerView.getChildCount();
                     totalItemCount = mLayoutManager.getItemCount();
                     firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
