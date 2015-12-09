@@ -28,6 +28,7 @@ import java.util.List;
 class YouTubeSearch {
 
     private static YouTube youtube;
+    private static YouTube.Search.List search;
     private static SearchListResponse searchResponse;
 
     private static final long NUMBER_OF_VIDEOS_RETURNED = 50;
@@ -39,6 +40,17 @@ class YouTubeSearch {
             public void initialize(HttpRequest request) throws IOException {
             }
         }).setApplicationName("mytube").build();
+
+        try {
+            search = youtube.search().list("id,snippet");
+            String apiKey = DeveloperKey.DEVELOPER_KEY;
+            search.setKey(apiKey);
+            search.setType("video");
+            search.setFields("items(id/kind,id/videoId,snippet/title,snippet/publishedAt),nextPageToken");
+            search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static YouTubeSearch getInstance() {
@@ -49,15 +61,8 @@ class YouTubeSearch {
     }
 
     public List<VideoEntry> search(String query) throws IOException {
-        YouTube.Search.List search = youtube.search().list("id,snippet");
-
-        String apiKey = DeveloperKey.DEVELOPER_KEY;
-        search.setKey(apiKey);
         search.setQ(query);
-        search.setType("video");
-        search.setFields("items(id/kind,id/videoId,snippet/title,snippet/publishedAt),nextPageToken");
-        search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
-
+        search.setPageToken("");
         searchResponse = search.execute();
         List<SearchResult> searchResults = searchResponse.getItems();
 
@@ -122,15 +127,7 @@ class YouTubeSearch {
     }
 
     public List<VideoEntry> loadNextPage() throws IOException {
-        YouTube.Search.List search = youtube.search().list("id,snippet");
-
-        String apiKey = DeveloperKey.DEVELOPER_KEY;
-        search.setKey(apiKey);
         search.setPageToken(searchResponse.getNextPageToken());
-        search.setType("video");
-        search.setFields("items(id/kind,id/videoId,snippet/title,snippet/publishedAt),nextPageToken");
-        search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
-
         searchResponse = search.execute();
         List<SearchResult> searchResults = searchResponse.getItems();
 
