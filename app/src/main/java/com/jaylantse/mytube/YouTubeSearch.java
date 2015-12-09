@@ -27,14 +27,13 @@ import java.util.List;
  */
 class YouTubeSearch {
 
-    private static YouTube youtube;
     private static YouTube.Search.List search;
     private static SearchListResponse searchResponse;
 
     private static final long NUMBER_OF_VIDEOS_RETURNED = 50;
 
     public YouTubeSearch() {
-        youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
+        YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
             public void initialize(HttpRequest request) throws IOException {
             }
         }).setApplicationName("mytube").build();

@@ -32,6 +32,7 @@ public class FavoriteVideosFragment extends Fragment implements MainActivity.Upd
         return view;
     }
 
+    @Override
     public void update() {
         List<VideoEntry> favoritesList = favoriteVideos.getFavoritesList();
         videoListFrag.setVideoListAdapter(favoritesList);

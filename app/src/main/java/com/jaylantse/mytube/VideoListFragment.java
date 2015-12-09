@@ -60,7 +60,7 @@ public class VideoListFragment extends Fragment {
                     }
                     if (!loading && (totalItemCount - visibleItemCount)
                             <= (firstVisibleItem + visibleThreshold)) {
-                        notifyParents();
+                        notifyParent();
                         loading = true;
                     }
                 }
@@ -98,10 +98,12 @@ public class VideoListFragment extends Fragment {
         ((VideoListAdapter) videoRecyclerView.getAdapter()).addVideos(videosList);
     }
 
-    private void notifyParents() {
+    private void notifyParent() {
         Fragment parent = getParentFragment();
-        if (parent instanceof Searchable) {
-            ((Searchable) parent).loadMoreVideos();
+        if (parent != null) {
+            if (parent instanceof Searchable) {
+                ((Searchable) parent).loadMoreVideos();
+            }
         }
     }
 
