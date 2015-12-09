@@ -1,6 +1,7 @@
 package com.jaylantse.mytube;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Parcel;
@@ -175,9 +176,9 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
             Activity activity = (Activity) v.getContext();
             Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity,
                     DeveloperKey.DEVELOPER_KEY, videoId, 0, true, false);
-            if (intent != null) {
+            try {
                 activity.startActivityForResult(intent, REQ_START_STANDALONE_PLAYER);
-            } else {
+            } catch (ActivityNotFoundException e){
                 Snackbar.make(v.getRootView(), "YouTube is not installed.", Snackbar.LENGTH_LONG).show();
             }
         }
