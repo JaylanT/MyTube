@@ -32,7 +32,9 @@ class YouTubeSearch {
 
     private static final long NUMBER_OF_VIDEOS_RETURNED = 25;
 
-    public YouTubeSearch() {
+    private static YouTubeSearch instance = null;
+
+    private YouTubeSearch() {
         YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
             public void initialize(HttpRequest request) throws IOException {
             }
@@ -49,6 +51,31 @@ class YouTubeSearch {
             e.printStackTrace();
         }
     }
+
+    public static YouTubeSearch getInstance() {
+        if (instance == null) {
+            instance = new YouTubeSearch();
+        }
+        return instance;
+    }
+
+//    public YouTubeSearch() {
+//        YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
+//            public void initialize(HttpRequest request) throws IOException {
+//            }
+//        }).setApplicationName("mytube").build();
+//
+//        try {
+//            String apiKey = DeveloperKey.DEVELOPER_KEY;
+//            search = youtube.search().list("id,snippet");
+//            search.setKey(apiKey);
+//            search.setType("video");
+//            search.setFields("items(id/kind,id/videoId,snippet/title,snippet/publishedAt),nextPageToken");
+//            search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public List<VideoEntry> search(String query) throws IOException {
         search.setQ(query);

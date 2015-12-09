@@ -1,5 +1,6 @@
 package com.jaylantse.mytube;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,10 +28,11 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.P
         videoListFrag = (VideoListFragment) getChildFragmentManager().findFragmentById(R.id.fragment);
         loading = (ProgressBar) view.findViewById(R.id.progressBar);
 
-        youTubeSearch = new YouTubeSearch();
+        youTubeSearch = YouTubeSearch.getInstance();
 
         // Blank search to get hot videos
         if (savedInstanceState == null) {
+            System.out.println("here");
             search("");
         }
         return view;
@@ -47,22 +49,32 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.P
     }
 
     private void updateVideoList(final List<VideoEntry> searchResultList) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                videoListFrag.setVideoListAdapter(searchResultList);
-            }
-        });
+        // Crashes when activity is destroyed (rotate, etc.)
+        // Temporary fix, but introduces new bug
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    videoListFrag.setVideoListAdapter(searchResultList);
+                }
+            });
+        }
     }
 
     private void loadNextPage(final List<VideoEntry> searchResultList) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                videoListFrag.addVideosToAdapter(searchResultList);
-                loading.setVisibility(View.GONE);
-            }
-        });
+        // Crashes when activity is destroyed (rotate, etc.)
+        // Temporary fix, but introduces new bug
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    videoListFrag.addVideosToAdapter(searchResultList);
+                    loading.setVisibility(View.GONE);
+                }
+            });
+        }
     }
 
     @Override
