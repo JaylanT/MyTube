@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by Jaylan Tse on 12/5/2015.
  */
-public class VideoSearchFragment extends Fragment implements VideoListFragment.notifiableFragment {
+public class VideoSearchFragment extends Fragment implements VideoListFragment.Searchable {
 
     private VideoListFragment videoListFrag;
     private YouTubeSearch youTubeSearch;
@@ -27,7 +27,7 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.n
         videoListFrag = (VideoListFragment) getChildFragmentManager().findFragmentById(R.id.fragment);
         loading = (ProgressBar) view.findViewById(R.id.progressBar);
 
-        youTubeSearch = YouTubeSearch.getInstance();
+        youTubeSearch = new YouTubeSearch();
 
         // Blank search to get hot videos
         if (savedInstanceState == null) {
@@ -66,7 +66,7 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.n
     }
 
     @Override
-    public void update() {
+    public void loadMoreVideos() {
         loading.setVisibility(View.VISIBLE);
         new AsyncYouTubeLoadNext().execute();
     }

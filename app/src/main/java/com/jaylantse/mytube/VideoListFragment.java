@@ -100,12 +100,12 @@ public class VideoListFragment extends Fragment {
 
     private void notifyParents() {
         Fragment parent = getParentFragment();
-        if (parent instanceof notifiableFragment) {
-            ((notifiableFragment) parent).update();
+        if (parent instanceof Searchable) {
+            ((Searchable) parent).loadMoreVideos();
         }
     }
 
-    interface notifiableFragment {
-        void update();
+    interface Searchable {
+        void loadMoreVideos();
     }
 }

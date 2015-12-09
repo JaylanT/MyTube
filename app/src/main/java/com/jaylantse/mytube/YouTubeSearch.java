@@ -33,9 +33,7 @@ class YouTubeSearch {
 
     private static final long NUMBER_OF_VIDEOS_RETURNED = 50;
 
-    private static YouTubeSearch instance = null;
-
-    private YouTubeSearch() {
+    public YouTubeSearch() {
         youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
             public void initialize(HttpRequest request) throws IOException {
             }
@@ -51,13 +49,6 @@ class YouTubeSearch {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static YouTubeSearch getInstance() {
-        if (instance == null) {
-            instance = new YouTubeSearch();
-        }
-        return instance;
     }
 
     public List<VideoEntry> search(String query) throws IOException {
