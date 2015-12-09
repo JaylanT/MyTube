@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by Jaylan Tse on 12/5/2015.
  */
-public class VideoSearchFragment extends Fragment implements VideoListFragment.Searchable {
+public class VideoSearchFragment extends Fragment implements VideoListFragment.Paginator {
 
     private VideoListFragment videoListFrag;
     private YouTubeSearch youTubeSearch;
@@ -66,7 +66,7 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.S
     }
 
     @Override
-    public void loadMoreVideos() {
+    public void paginate() {
         loading.setVisibility(View.VISIBLE);
         new AsyncYouTubeLoadNext().execute();
     }

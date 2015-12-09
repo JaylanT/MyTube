@@ -30,7 +30,7 @@ class YouTubeSearch {
     private static YouTube.Search.List search;
     private static SearchListResponse searchResponse;
 
-    private static final long NUMBER_OF_VIDEOS_RETURNED = 50;
+    private static final long NUMBER_OF_VIDEOS_RETURNED = 25;
 
     public YouTubeSearch() {
         YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
@@ -39,8 +39,8 @@ class YouTubeSearch {
         }).setApplicationName("mytube").build();
 
         try {
-            search = youtube.search().list("id,snippet");
             String apiKey = DeveloperKey.DEVELOPER_KEY;
+            search = youtube.search().list("id,snippet");
             search.setKey(apiKey);
             search.setType("video");
             search.setFields("items(id/kind,id/videoId,snippet/title,snippet/publishedAt),nextPageToken");
@@ -53,6 +53,15 @@ class YouTubeSearch {
     public List<VideoEntry> search(String query) throws IOException {
         search.setQ(query);
         search.setPageToken("");
+        return getResults();
+    }
+
+    public List<VideoEntry> loadNextPage() throws IOException {
+        search.setPageToken(searchResponse.getNextPageToken());
+        return getResults();
+    }
+
+    private List<VideoEntry> getResults() throws IOException {
         searchResponse = search.execute();
         List<SearchResult> searchResults = searchResponse.getItems();
 
@@ -114,36 +123,5 @@ class YouTubeSearch {
         }
 
         return viewCounts;
-    }
-
-    public List<VideoEntry> loadNextPage() throws IOException {
-        search.setPageToken(searchResponse.getNextPageToken());
-        searchResponse = search.execute();
-        List<SearchResult> searchResults = searchResponse.getItems();
-
-        List<VideoEntry> videoEntries = new ArrayList<>();
-        String videoIds = "";
-
-        for (SearchResult result : searchResults) {
-            ResourceId rId = result.getId();
-
-            // Confirm that the result represents a video. Otherwise, the
-            // item will not contain a video ID.
-            if (rId.getKind().equals("youtube#video")) {
-                String title = result.getSnippet().getTitle();
-                String publishedAt = result.getSnippet().getPublishedAt().toStringRfc3339();
-                String videoId = rId.getVideoId();
-
-                videoEntries.add(new VideoEntry(videoId, title, publishedAt));
-                videoIds += videoId + ",";
-            }
-        }
-
-        List<Integer> viewCounts = getViewCounts(videoIds.substring(0, videoIds.length() - 1));
-        for (int i = 0; i < videoEntries.size(); i++) {
-            videoEntries.get(i).setViewCount(viewCounts.get(i));
-        }
-
-        return videoEntries;
     }
 }

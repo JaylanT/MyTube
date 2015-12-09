@@ -101,13 +101,13 @@ public class VideoListFragment extends Fragment {
     private void notifyParent() {
         Fragment parent = getParentFragment();
         if (parent != null) {
-            if (parent instanceof Searchable) {
-                ((Searchable) parent).loadMoreVideos();
+            if (parent instanceof Paginator) {
+                ((Paginator) parent).paginate();
             }
         }
     }
 
-    interface Searchable {
-        void loadMoreVideos();
+    interface Paginator {
+        void paginate();
     }
 }

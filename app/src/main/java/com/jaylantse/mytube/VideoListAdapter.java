@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,10 +68,16 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         holder.videoViewCount.setText(viewCountString);
 
         final String videoId = singleVideo.getVideoId();
-        holder.videoId = videoId;
-        holder.videoThumb.setTag(videoId);
-        // TODO: fix leak here
-        holder.videoThumb.initialize(DeveloperKey.DEVELOPER_KEY, thumbnailListener);
+        YouTubeThumbnailView videoThumb = holder.videoThumb;
+        YouTubeThumbnailLoader loader = thumbnailViewToLoaderMap.get(videoThumb);
+        if (loader == null) {
+            holder.videoId = videoId;
+            videoThumb.setTag(videoId);
+            videoThumb.initialize(DeveloperKey.DEVELOPER_KEY, thumbnailListener);
+        } else {
+            videoThumb.setImageResource(R.drawable.loading_thumbnail);
+            loader.setVideo(videoId);
+        }
 
         if (favoriteVideos.containsVideo(videoId)) {
             holder.videoFavorite.setImageResource(R.drawable.ic_star_black_24dp);
@@ -90,16 +97,6 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
                 }
             }
         });
-    }
-
-    @Override
-    public void onViewRecycled(VideoViewHolder vh) {
-        vh.videoThumb.setImageResource(R.drawable.loading_thumbnail);
-
-        YouTubeThumbnailView videoThumb = vh.videoThumb;
-        if (thumbnailViewToLoaderMap.containsKey(videoThumb)) {
-            thumbnailViewToLoaderMap.get(videoThumb).release();
-        }
     }
 
     @Override
@@ -178,7 +175,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
             Activity activity = (Activity) v.getContext();
             Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity,
                     DeveloperKey.DEVELOPER_KEY, videoId, 0, true, false);
-            activity.startActivityForResult(intent, REQ_START_STANDALONE_PLAYER);
+            if (intent != null) {
+                activity.startActivityForResult(intent, REQ_START_STANDALONE_PLAYER);
+            } else {
+                Snackbar.make(v.getRootView(), "YouTube is not installed.", Snackbar.LENGTH_LONG).show();
+            }
         }
     }
 
