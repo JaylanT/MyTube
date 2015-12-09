@@ -93,6 +93,16 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     }
 
     @Override
+    public void onViewRecycled(VideoViewHolder vh) {
+        vh.videoThumb.setImageResource(R.drawable.loading_thumbnail);
+
+        YouTubeThumbnailView videoThumb = vh.videoThumb;
+        if (thumbnailViewToLoaderMap.containsKey(videoThumb)) {
+            thumbnailViewToLoaderMap.get(videoThumb).release();
+        }
+    }
+
+    @Override
     public int getItemCount() {
         return videos.size();
     }
@@ -134,6 +144,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         return 0;
     }
 
+    public void addVideos(List<VideoEntry> videosList) {
+        int lastPosition = getItemCount();
+        videos.addAll(videosList);
+        notifyItemInserted(lastPosition);
+    }
 
     public class VideoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -175,10 +190,10 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         public void onInitializationSuccess(
                 YouTubeThumbnailView view, YouTubeThumbnailLoader loader) {
             loader.setOnThumbnailLoadedListener(this);
-            thumbnailViewToLoaderMap.put(view, loader);
             view.setImageResource(R.drawable.loading_thumbnail);
             String videoId = (String) view.getTag();
             loader.setVideo(videoId);
+            thumbnailViewToLoaderMap.put(view, loader);
         }
 
         @Override

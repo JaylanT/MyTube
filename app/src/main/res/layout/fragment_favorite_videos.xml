@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_favorites_videos"
+        android:id="@+id/no_favorite_videos"
+        android:layout_gravity="center_horizontal"
+        android:textSize="20sp"
+        android:layout_marginTop="25dp"
+        android:visibility="gone" />
 
     <fragment
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="com.jaylantse.mytube.VideoListFragment"
         android:id="@+id/favorites_fragment"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        tools:layout="@layout/fragment_videos_list" />
 </LinearLayout>

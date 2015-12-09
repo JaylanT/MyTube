@@ -4,4 +4,6 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="search">Search</string>
     <string name="view_count">%1$s views</string>
+    <string name="no_favorites_videos">No favorite videos.</string>
+    <string name="load_more">Load More</string>
 </resources>

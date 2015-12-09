@@ -27,30 +27,38 @@ import java.util.List;
  */
 class YouTubeSearch {
 
+    private static YouTube youtube;
+    private static SearchListResponse searchResponse;
+
     private static final long NUMBER_OF_VIDEOS_RETURNED = 50;
 
-    public static List<VideoEntry> search(String query) throws IOException {
-        YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
+    private static YouTubeSearch instance = null;
+
+    private YouTubeSearch() {
+        youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
             public void initialize(HttpRequest request) throws IOException {
             }
         }).setApplicationName("mytube").build();
+    }
 
+    public static YouTubeSearch getInstance() {
+        if (instance == null) {
+            instance = new YouTubeSearch();
+        }
+        return instance;
+    }
+
+    public List<VideoEntry> search(String query) throws IOException {
         YouTube.Search.List search = youtube.search().list("id,snippet");
 
         String apiKey = DeveloperKey.DEVELOPER_KEY;
         search.setKey(apiKey);
         search.setQ(query);
-
-        // Restrict the search results to only include videos. See:
-        // https://developers.google.com/youtube/v3/docs/search/list#type
         search.setType("video");
-
-        // To increase efficiency, only retrieve the fields that the
-        // application uses.
-        search.setFields("items(id/kind,id/videoId,snippet/title,snippet/publishedAt)");
+        search.setFields("items(id/kind,id/videoId,snippet/title,snippet/publishedAt),nextPageToken");
         search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
 
-        SearchListResponse searchResponse = search.execute();
+        searchResponse = search.execute();
         List<SearchResult> searchResults = searchResponse.getItems();
 
         List<VideoEntry> videoEntries = new ArrayList<>();
@@ -79,7 +87,7 @@ class YouTubeSearch {
         return videoEntries;
     }
 
-    private static List<Integer> getViewCounts(String videoId) throws IOException {
+    private List<Integer> getViewCounts(String videoId) throws IOException {
         URL url = new URL("https://www.googleapis.com/youtube/v3/videos?id="
                 + videoId + "&key=" +DeveloperKey.DEVELOPER_KEY
                 +"&part=statistics&fields=items(statistics(viewCount))");
@@ -96,7 +104,7 @@ class YouTubeSearch {
         return parseJson(is);
     }
 
-    private static List<Integer> parseJson(InputStream stream) {
+    private List<Integer> parseJson(InputStream stream) {
         Gson gson = new GsonBuilder().create();
         final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         JsonObject json = gson.fromJson(reader, JsonObject.class);
@@ -111,5 +119,44 @@ class YouTubeSearch {
         }
 
         return viewCounts;
+    }
+
+    public List<VideoEntry> loadNextPage() throws IOException {
+        YouTube.Search.List search = youtube.search().list("id,snippet");
+
+        String apiKey = DeveloperKey.DEVELOPER_KEY;
+        search.setKey(apiKey);
+        search.setPageToken(searchResponse.getNextPageToken());
+        search.setType("video");
+        search.setFields("items(id/kind,id/videoId,snippet/title,snippet/publishedAt),nextPageToken");
+        search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
+
+        searchResponse = search.execute();
+        List<SearchResult> searchResults = searchResponse.getItems();
+
+        List<VideoEntry> videoEntries = new ArrayList<>();
+        String videoIds = "";
+
+        for (SearchResult result : searchResults) {
+            ResourceId rId = result.getId();
+
+            // Confirm that the result represents a video. Otherwise, the
+            // item will not contain a video ID.
+            if (rId.getKind().equals("youtube#video")) {
+                String title = result.getSnippet().getTitle();
+                String publishedAt = result.getSnippet().getPublishedAt().toStringRfc3339();
+                String videoId = rId.getVideoId();
+
+                videoEntries.add(new VideoEntry(videoId, title, publishedAt));
+                videoIds += videoId + ",";
+            }
+        }
+
+        List<Integer> viewCounts = getViewCounts(videoIds.substring(0, videoIds.length() - 1));
+        for (int i = 0; i < videoEntries.size(); i++) {
+            videoEntries.get(i).setViewCount(viewCounts.get(i));
+        }
+
+        return videoEntries;
     }
 }

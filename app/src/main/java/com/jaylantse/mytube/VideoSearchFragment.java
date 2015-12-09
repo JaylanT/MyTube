@@ -6,15 +6,18 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import java.util.List;
 
 /**
  * Created by Jaylan Tse on 12/5/2015.
  */
-public class VideoSearchFragment extends Fragment {
+public class VideoSearchFragment extends Fragment implements VideoListFragment.notifiableFragment {
 
     private VideoListFragment videoListFrag;
+    private YouTubeSearch youTubeSearch;
+    private ProgressBar loading;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -22,8 +25,21 @@ public class VideoSearchFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_search_videos, container, false);
         videoListFrag = (VideoListFragment) getChildFragmentManager().findFragmentById(R.id.fragment);
+        loading = (ProgressBar) view.findViewById(R.id.progressBar);
 
+        youTubeSearch = YouTubeSearch.getInstance();
+
+        // Blank search to get hot videos
+        if (savedInstanceState == null) {
+            search("");
+        }
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("firstRun", true);
     }
 
     public void search(String query) {
@@ -39,6 +55,22 @@ public class VideoSearchFragment extends Fragment {
         });
     }
 
+    private void loadNextPage(final List<VideoEntry> searchResultList) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                videoListFrag.addVideosToAdapter(searchResultList);
+                loading.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    @Override
+    public void update() {
+        loading.setVisibility(View.VISIBLE);
+        new AsyncYouTubeLoadNext().execute();
+    }
+
     private class AsyncYouTubeSearch extends AsyncTask<String, Void, List<VideoEntry>> {
 
         @Override
@@ -46,7 +78,7 @@ public class VideoSearchFragment extends Fragment {
             String query = params[0];
 
             try {
-                return YouTubeSearch.search(query);
+                return youTubeSearch.search(query);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -58,6 +90,27 @@ public class VideoSearchFragment extends Fragment {
         protected void onPostExecute(List<VideoEntry> videoList) {
             if (videoList != null) {
                 updateVideoList(videoList);
+            }
+        }
+    }
+
+    private class AsyncYouTubeLoadNext extends AsyncTask<Void, Void, List<VideoEntry>> {
+
+        @Override
+        protected List<VideoEntry> doInBackground(Void... params) {
+            try {
+                return youTubeSearch.loadNextPage();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<VideoEntry> videoList) {
+            if (videoList != null) {
+                loadNextPage(videoList);
             }
         }
     }

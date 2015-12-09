@@ -5,6 +5,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.List;
 
 /**
  * Created by Jaylan Tse on 12/7/2015.
@@ -13,6 +16,7 @@ public class FavoriteVideosFragment extends Fragment implements MainActivity.Upd
 
     private VideoListFragment videoListFrag;
     private FavoriteVideos favoriteVideos;
+    private TextView noVideosView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -22,12 +26,19 @@ public class FavoriteVideosFragment extends Fragment implements MainActivity.Upd
 
         favoriteVideos = FavoriteVideos.getInstance(getContext());
         videoListFrag = (VideoListFragment) getChildFragmentManager().findFragmentById(R.id.favorites_fragment);
-        videoListFrag.setVideoListAdapter(favoriteVideos.getFavoritesList());
+        noVideosView = (TextView) view.findViewById(R.id.no_favorite_videos);
+        update();
 
         return view;
     }
 
     public void update() {
-        videoListFrag.setVideoListAdapter(favoriteVideos.getFavoritesList());
+        List<VideoEntry> favoritesList = favoriteVideos.getFavoritesList();
+        videoListFrag.setVideoListAdapter(favoritesList);
+        if (!favoritesList.isEmpty()) {
+            noVideosView.setVisibility(View.GONE);
+        } else {
+            noVideosView.setVisibility(View.VISIBLE);
+        }
     }
 }
