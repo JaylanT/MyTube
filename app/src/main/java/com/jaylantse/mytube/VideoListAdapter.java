@@ -35,14 +35,12 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     private final ThumbnailListener thumbnailListener;
     private final Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbnailViewToLoaderMap;
     private final FavoriteVideos favoriteVideos;
-    private Context mContext;
 
     /**
      * Constructor
      */
     public VideoListAdapter(List<VideoEntry> videos, Context mContext) {
         this.videos = videos;
-        this.mContext = mContext;
 
         thumbnailListener = new ThumbnailListener();
         thumbnailViewToLoaderMap = new HashMap<>();
@@ -117,7 +115,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
         thumbnailListener = new ThumbnailListener();
         thumbnailViewToLoaderMap = new HashMap<>();
-        favoriteVideos = FavoriteVideos.getInstance(mContext);
+        favoriteVideos = FavoriteVideos.getInstance();
     }
 
     @Override

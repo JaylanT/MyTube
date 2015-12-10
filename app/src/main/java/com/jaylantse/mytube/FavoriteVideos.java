@@ -5,6 +5,7 @@ import android.content.Context;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -17,14 +18,15 @@ import java.util.Map;
  */
 class FavoriteVideos {
 
-    private final Context mContext;
+    private static Context mContext;
     private HashMap<String, VideoEntry> favoritesMap;
+    private boolean hasChanged;
 
     private static FavoriteVideos instance = null;
 
     private FavoriteVideos(Context mContext) {
-        this.mContext = mContext;
-
+        FavoriteVideos.mContext = mContext;
+        hasChanged = true;
         loadFavoriteVideos();
     }
 
@@ -35,24 +37,26 @@ class FavoriteVideos {
         return instance;
     }
 
+    public static FavoriteVideos getInstance() {
+        return instance;
+    }
+
     public void addToFavorites(String videoId, VideoEntry videoEntry) {
         favoritesMap.put(videoId, videoEntry);
+        hasChanged = true;
 
-        try {
-            saveFavoriteVideos();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        saveFavoriteVideos();
     }
 
     public void removeFromFavorites(String videoId) {
         favoritesMap.remove(videoId);
+        hasChanged = true;
 
-        try {
-            saveFavoriteVideos();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        saveFavoriteVideos();
+    }
+
+    public boolean hasChanged() {
+        return hasChanged;
     }
 
     public boolean containsVideo(String videoId) {
@@ -60,6 +64,8 @@ class FavoriteVideos {
     }
 
     public List<VideoEntry> getFavoritesList() {
+        hasChanged = false;
+
         List<VideoEntry> favoriteVideos = new ArrayList<>();
         for(Map.Entry<String, VideoEntry> entry : favoritesMap.entrySet()) {
             favoriteVideos.add(entry.getValue());
@@ -84,11 +90,15 @@ class FavoriteVideos {
         }
     }
 
-    private void saveFavoriteVideos() throws Exception {
+    private void saveFavoriteVideos() {
         File file = new File(mContext.getDir("data", Context.MODE_PRIVATE), "favorites");
-        ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
-        outputStream.writeObject(favoritesMap);
-        outputStream.flush();
-        outputStream.close();
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
+            outputStream.writeObject(favoritesMap);
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+           e.printStackTrace();
+        }
     }
 }

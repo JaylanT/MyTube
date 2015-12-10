@@ -34,12 +34,14 @@ public class FavoriteVideosFragment extends Fragment implements MainActivity.Upd
 
     @Override
     public void update() {
-        List<VideoEntry> favoritesList = favoriteVideos.getFavoritesList();
-        videoListFrag.setVideoListAdapter(favoritesList);
-        if (!favoritesList.isEmpty()) {
-            noVideosView.setVisibility(View.GONE);
-        } else {
-            noVideosView.setVisibility(View.VISIBLE);
+        if (favoriteVideos.hasChanged()) {
+            List<VideoEntry> favoritesList = favoriteVideos.getFavoritesList();
+            videoListFrag.setVideoListAdapter(favoritesList);
+            if (!favoritesList.isEmpty()) {
+                noVideosView.setVisibility(View.GONE);
+            } else {
+                noVideosView.setVisibility(View.VISIBLE);
+            }
         }
     }
 }
