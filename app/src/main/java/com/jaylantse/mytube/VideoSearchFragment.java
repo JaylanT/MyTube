@@ -21,6 +21,12 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.P
     private ProgressBar loading;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        youTubeSearch = YouTubeSearch.getInstance();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -28,11 +34,8 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.P
         videoListFrag = (VideoListFragment) getChildFragmentManager().findFragmentById(R.id.fragment);
         loading = (ProgressBar) view.findViewById(R.id.progressBar);
 
-        youTubeSearch = YouTubeSearch.getInstance();
-
         // Blank search to get hot videos
         if (savedInstanceState == null) {
-            System.out.println("here");
             search("");
         }
         return view;

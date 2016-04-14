@@ -31,14 +31,14 @@ public class VideoListFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_videos_list, container, false);
 
-        videoRecyclerView = (RecyclerView) view.findViewById(R.id.video_list_recycler_view);
-
         if (savedInstanceState != null) {
             videoListAdapter = savedInstanceState.getParcelable("adapter");
         } else {
             videoListAdapter = new VideoListAdapter(new ArrayList<VideoEntry>(), getContext());
         }
+        videoRecyclerView = (RecyclerView) view.findViewById(R.id.video_list_recycler_view);
         videoRecyclerView.setAdapter(videoListAdapter);
+
         final LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         videoRecyclerView.setLayoutManager(mLayoutManager);
 

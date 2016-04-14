@@ -115,6 +115,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
         thumbnailListener = new ThumbnailListener();
         thumbnailViewToLoaderMap = new HashMap<>();
+        // TODO: need to get context again
         favoriteVideos = FavoriteVideos.getInstance();
     }
 
