@@ -46,8 +46,6 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.P
     }
 
     private void updateVideoList(final ArrayList<VideoEntry> searchResultList) {
-        // Crashes when activity is destroyed (rotate, etc.)
-        // Temporary fix, but introduces new bug
         Activity activity = getActivity();
         if (activity != null) {
             activity.runOnUiThread(new Runnable() {
@@ -60,8 +58,6 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.P
     }
 
     private void loadNextPage(final ArrayList<VideoEntry> searchResultList) {
-        // Crashes when activity is destroyed (rotate, etc.)
-        // Temporary fix, but introduces new bug
         Activity activity = getActivity();
         if (activity != null) {
             activity.runOnUiThread(new Runnable() {

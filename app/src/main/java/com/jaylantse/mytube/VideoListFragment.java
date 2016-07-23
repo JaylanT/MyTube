@@ -17,12 +17,15 @@ public class VideoListFragment extends Fragment {
 
     private RecyclerView videoRecyclerView;
     private VideoListAdapter videoListAdapter;
+
     private int previousTotal = 0;
-    private boolean loading = true;
     private int visibleThreshold = 5;
     private int firstVisibleItem;
     private int visibleItemCount;
     private int totalItemCount;
+    private boolean loading = true;
+
+    private static final String VIDEOS_LIST = "videosList";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -31,7 +34,7 @@ public class VideoListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_videos_list, container, false);
 
         if (savedInstanceState != null) {
-            ArrayList<VideoEntry> videosList = savedInstanceState.getParcelableArrayList("test");
+            ArrayList<VideoEntry> videosList = savedInstanceState.getParcelableArrayList(VIDEOS_LIST);
             videoListAdapter = new VideoListAdapter(videosList, getContext());
         } else {
             videoListAdapter = new VideoListAdapter(new ArrayList<VideoEntry>(), getContext());
@@ -72,7 +75,8 @@ public class VideoListFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("test", videoListAdapter.getVideos());
+
+        outState.putParcelableArrayList(VIDEOS_LIST, videoListAdapter.getVideos());
     }
 
     @Override

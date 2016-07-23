@@ -102,8 +102,8 @@ class YouTubeSearch {
 
     private List<Integer> getViewCounts(String videoId) throws IOException {
         URL url = new URL("https://www.googleapis.com/youtube/v3/videos?id="
-                + videoId + "&key=" +DeveloperKey.DEVELOPER_KEY
-                +"&part=statistics&fields=items(statistics(viewCount))");
+                + videoId + "&key=" + DeveloperKey.DEVELOPER_KEY
+                + "&part=statistics&fields=items(statistics(viewCount))");
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setReadTimeout(10000 /* milliseconds */);
