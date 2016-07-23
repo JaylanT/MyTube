@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by Jaylan Tse on 12/7/2015.
@@ -27,15 +27,21 @@ public class FavoriteVideosFragment extends Fragment implements MainActivity.Upd
         favoriteVideos = FavoriteVideos.getInstance(getContext());
         videoListFrag = (VideoListFragment) getChildFragmentManager().findFragmentById(R.id.favorites_fragment);
         noVideosView = (TextView) view.findViewById(R.id.no_favorite_videos);
-        update();
 
         return view;
     }
 
     @Override
-    public void update() {
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        updateList();
+    }
+
+    @Override
+    public void updateList() {
         if (favoriteVideos.hasChanged()) {
-            List<VideoEntry> favoritesList = favoriteVideos.getFavoritesList();
+            ArrayList<VideoEntry> favoritesList = favoriteVideos.getFavoritesList();
             videoListFrag.setVideoListAdapter(favoritesList);
             if (!favoritesList.isEmpty()) {
                 noVideosView.setVisibility(View.GONE);

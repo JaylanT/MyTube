@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public int getItemPosition(Object object) {
             if (object instanceof UpdateableFragment) {
-                ((FavoriteVideosFragment) object).update();
+                ((FavoriteVideosFragment) object).updateList();
             }
 
             return super.getItemPosition(object);
@@ -160,6 +160,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     interface UpdateableFragment {
-        void update();
+        void updateList();
     }
 }

@@ -59,40 +59,22 @@ class YouTubeSearch {
         return instance;
     }
 
-//    public YouTubeSearch() {
-//        YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
-//            public void initialize(HttpRequest request) throws IOException {
-//            }
-//        }).setApplicationName("mytube").build();
-//
-//        try {
-//            String apiKey = DeveloperKey.DEVELOPER_KEY;
-//            search = youtube.search().list("id,snippet");
-//            search.setKey(apiKey);
-//            search.setType("video");
-//            search.setFields("items(id/kind,id/videoId,snippet/title,snippet/publishedAt),nextPageToken");
-//            search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-    public List<VideoEntry> search(String query) throws IOException {
+    public ArrayList<VideoEntry> search(String query) throws IOException {
         search.setQ(query);
         search.setPageToken("");
         return getResults();
     }
 
-    public List<VideoEntry> loadNextPage() throws IOException {
+    public ArrayList<VideoEntry> loadNextPage() throws IOException {
         search.setPageToken(searchResponse.getNextPageToken());
         return getResults();
     }
 
-    private List<VideoEntry> getResults() throws IOException {
+    private ArrayList<VideoEntry> getResults() throws IOException {
         searchResponse = search.execute();
         List<SearchResult> searchResults = searchResponse.getItems();
 
-        List<VideoEntry> videoEntries = new ArrayList<>();
+        ArrayList<VideoEntry> videoEntries = new ArrayList<>();
         String videoIds = "";
 
         for (SearchResult result : searchResults) {

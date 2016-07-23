@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by Jaylan Tse on 12/5/2015.
@@ -41,17 +41,11 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.P
         return view;
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean("firstRun", true);
-    }
-
     public void search(String query) {
         new AsyncYouTubeSearch().execute(query);
     }
 
-    private void updateVideoList(final List<VideoEntry> searchResultList) {
+    private void updateVideoList(final ArrayList<VideoEntry> searchResultList) {
         // Crashes when activity is destroyed (rotate, etc.)
         // Temporary fix, but introduces new bug
         Activity activity = getActivity();
@@ -65,7 +59,7 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.P
         }
     }
 
-    private void loadNextPage(final List<VideoEntry> searchResultList) {
+    private void loadNextPage(final ArrayList<VideoEntry> searchResultList) {
         // Crashes when activity is destroyed (rotate, etc.)
         // Temporary fix, but introduces new bug
         Activity activity = getActivity();
@@ -86,10 +80,10 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.P
         new AsyncYouTubeLoadNext().execute();
     }
 
-    private class AsyncYouTubeSearch extends AsyncTask<String, Void, List<VideoEntry>> {
+    private class AsyncYouTubeSearch extends AsyncTask<String, Void, ArrayList<VideoEntry>> {
 
         @Override
-        protected List<VideoEntry> doInBackground(String[] params) {
+        protected ArrayList<VideoEntry> doInBackground(String[] params) {
             String query = params[0];
 
             try {
@@ -102,17 +96,17 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.P
         }
 
         @Override
-        protected void onPostExecute(List<VideoEntry> videoList) {
+        protected void onPostExecute(ArrayList<VideoEntry> videoList) {
             if (videoList != null) {
                 updateVideoList(videoList);
             }
         }
     }
 
-    private class AsyncYouTubeLoadNext extends AsyncTask<Void, Void, List<VideoEntry>> {
+    private class AsyncYouTubeLoadNext extends AsyncTask<Void, Void, ArrayList<VideoEntry>> {
 
         @Override
-        protected List<VideoEntry> doInBackground(Void... params) {
+        protected ArrayList<VideoEntry> doInBackground(Void... params) {
             try {
                 return youTubeSearch.loadNextPage();
             } catch (Exception e) {
@@ -123,7 +117,7 @@ public class VideoSearchFragment extends Fragment implements VideoListFragment.P
         }
 
         @Override
-        protected void onPostExecute(List<VideoEntry> videoList) {
+        protected void onPostExecute(ArrayList<VideoEntry> videoList) {
             if (videoList != null) {
                 loadNextPage(videoList);
             }

@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,10 +64,10 @@ class FavoriteVideos {
         return favoritesMap.containsKey(videoId);
     }
 
-    public List<VideoEntry> getFavoritesList() {
+    public ArrayList<VideoEntry> getFavoritesList() {
         hasChanged = false;
 
-        List<VideoEntry> favoriteVideos = new ArrayList<>();
+        ArrayList<VideoEntry> favoriteVideos = new ArrayList<>();
         for(Map.Entry<String, VideoEntry> entry : favoritesMap.entrySet()) {
             favoriteVideos.add(entry.getValue());
         }

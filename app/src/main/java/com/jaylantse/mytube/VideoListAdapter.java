@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,7 +16,6 @@ import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
 import com.google.android.youtube.player.YouTubeThumbnailView;
-import com.google.api.services.youtube.model.SearchResult;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -29,9 +26,9 @@ import java.util.Map;
 /**
  * Created by Jaylan Tse on 11/29/2015.
  */
-public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.VideoViewHolder> implements Parcelable {
+public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.VideoViewHolder> {
 
-    private final List<VideoEntry> videos;
+    private final ArrayList<VideoEntry> videos;
     private final ThumbnailListener thumbnailListener;
     private final Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbnailViewToLoaderMap;
     private final FavoriteVideos favoriteVideos;
@@ -39,7 +36,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     /**
      * Constructor
      */
-    public VideoListAdapter(List<VideoEntry> videos, Context mContext) {
+    public VideoListAdapter(ArrayList<VideoEntry> videos, Context mContext) {
         this.videos = videos;
 
         thumbnailListener = new ThumbnailListener();
@@ -109,36 +106,8 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         }
     }
 
-    private VideoListAdapter(Parcel in) {
-        videos = new ArrayList<>();
-        in.readList(videos, SearchResult.class.getClassLoader());
-
-        thumbnailListener = new ThumbnailListener();
-        thumbnailViewToLoaderMap = new HashMap<>();
-        // TODO: need to get context again
-        favoriteVideos = FavoriteVideos.getInstance();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeList(videos);
-    }
-
-    public static final Creator<VideoListAdapter> CREATOR = new Creator<VideoListAdapter>() {
-        @Override
-        public VideoListAdapter createFromParcel(Parcel in) {
-            return new VideoListAdapter(in);
-        }
-
-        @Override
-        public VideoListAdapter[] newArray(int size) {
-            return new VideoListAdapter[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
+    public ArrayList<VideoEntry> getVideos() {
+        return videos;
     }
 
     public void addVideos(List<VideoEntry> videosList) {

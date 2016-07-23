@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Jaylan Tse on 12/5/2015.
@@ -32,7 +31,8 @@ public class VideoListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_videos_list, container, false);
 
         if (savedInstanceState != null) {
-            videoListAdapter = savedInstanceState.getParcelable("adapter");
+            ArrayList<VideoEntry> videosList = savedInstanceState.getParcelableArrayList("test");
+            videoListAdapter = new VideoListAdapter(videosList, getContext());
         } else {
             videoListAdapter = new VideoListAdapter(new ArrayList<VideoEntry>(), getContext());
         }
@@ -72,7 +72,7 @@ public class VideoListFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("adapter", videoListAdapter);
+        outState.putParcelableArrayList("test", videoListAdapter.getVideos());
     }
 
     @Override
@@ -82,7 +82,7 @@ public class VideoListFragment extends Fragment {
         videoListAdapter.releaseLoaders();
     }
 
-    public void setVideoListAdapter(List<VideoEntry> videosList) {
+    public void setVideoListAdapter(ArrayList<VideoEntry> videosList) {
         videoListAdapter.releaseLoaders();
         videoListAdapter = new VideoListAdapter(videosList, getContext());
         videoRecyclerView.setAdapter(videoListAdapter);
@@ -93,7 +93,7 @@ public class VideoListFragment extends Fragment {
         visibleThreshold = 5;
     }
 
-    public void addVideosToAdapter(List<VideoEntry> videosList) {
+    public void addVideosToAdapter(ArrayList<VideoEntry> videosList) {
         ((VideoListAdapter) videoRecyclerView.getAdapter()).addVideos(videosList);
     }
 
